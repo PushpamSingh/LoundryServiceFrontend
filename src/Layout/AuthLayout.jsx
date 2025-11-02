@@ -2,11 +2,11 @@ import { Outlet } from "react-router-dom";
 import { Header } from "./Headers";
 export const AuthLayout = () => {
   return (
-    <div className="w-full">
-      <div className="w-full">
+    <div  className="w-[100%] h-[100vh] bg-[#F9FAFB]">
+      <div className="w-full mx-auto">
         <Header />
       </div>
-      <div className="w-2xs sm:w-2xl md:w-4xl lg:w-7xl flex flex-col justify-center items-center">
+      <div className="mx-auto  bg-[#F9FAFB]">
         <Outlet />
       </div>
     </div>

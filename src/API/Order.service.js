@@ -24,6 +24,19 @@ class OrderService {
             throw new Error(error.response?.data?.message || "create order failed");
         }
     }
+    async ConfirmOrder({ orderId, paymentmethod }) {
+        try {
+            const response = await API.put(`/confirmorder/${orderId}`, { paymentmethod }, { headers: { Authorization: `Bearer ${token}` } })
+            if (response?.data) {
+                return response?.data
+            } else {
+                return null
+            }
+        } catch (error) {
+            console.log("CreateOrder :: Error :: ", error);
+            throw new Error(error.response?.data?.message || "create order failed");
+        }
+    }
     async TrackOrder({ orderId }) {
         try {
             const response = await API.get('/trackorder', { orderId }, { headers: { Authorization: `Bearer ${token}` } })
@@ -50,12 +63,12 @@ class OrderService {
             throw new Error(error.response?.data?.message || "cancele order failed");
         }
     }
-    async Updatepickuptime({orderId,pickupTime,orderSchemaId}){
+    async Updatepickuptime({ orderId, pickupTime, orderSchemaId }) {
         try {
-            const response=await API.put(`/updatepickuptime/${orderSchemaId}`,{orderId,pickupTime},{ headers: { Authorization: `Bearer ${token}` } })
-            if(response?.data){
+            const response = await API.put(`/updatepickuptime/${orderSchemaId}`, { orderId, pickupTime }, { headers: { Authorization: `Bearer ${token}` } })
+            if (response?.data) {
                 return response?.data
-            }else{
+            } else {
                 return null
             }
         } catch (error) {
@@ -63,12 +76,12 @@ class OrderService {
             throw new Error(error.response?.data?.message || "pickup time update failed");
         }
     }
-    async Updatedeliverytime({orderId,deliveryTime,orderSchemaId}){
+    async Updatedeliverytime({ orderId, deliveryTime, orderSchemaId }) {
         try {
-            const response=await API.put(`/updatedeliverytime/${orderSchemaId}`,{orderId,deliveryTime},{ headers: { Authorization: `Bearer ${token}` } })
-            if(response?.data){
+            const response = await API.put(`/updatedeliverytime/${orderSchemaId}`, { orderId, deliveryTime }, { headers: { Authorization: `Bearer ${token}` } })
+            if (response?.data) {
                 return response?.data
-            }else{
+            } else {
                 return null
             }
         } catch (error) {
@@ -76,12 +89,12 @@ class OrderService {
             throw new Error(error.response?.data?.message || "delivery time update failed");
         }
     }
-    async Updatestatus({orderId, status,orderSchemaId}){
+    async Updatestatus({ orderId, status, orderSchemaId }) {
         try {
-            const response=await API.put(`/updatestatus/${orderSchemaId}`,{orderId,status},{ headers: { Authorization: `Bearer ${token}` } })
-            if(response?.data){
+            const response = await API.put(`/updatestatus/${orderSchemaId}`, { orderId, status }, { headers: { Authorization: `Bearer ${token}` } })
+            if (response?.data) {
                 return response?.data
-            }else{
+            } else {
                 return null
             }
         } catch (error) {
@@ -89,4 +102,18 @@ class OrderService {
             throw new Error(error.response?.data?.message || "status update failed");
         }
     }
+    async GetOneOrder({ orderSchemaId }) {
+        try {
+            const response = await API.get(`/getoneorder/${orderSchemaId}`, { headers: { Authorization: `Bearer ${token}` } })
+            if (response?.data) {
+                return response?.data
+            } else {
+                return null
+            }
+        } catch (error) {
+            console.log("GetOneOrder :: Error :: ", error);
+            throw new Error(error.response?.data?.message || "get one order failed");
+        }
+    }
 }
+export const orderService = new OrderService()

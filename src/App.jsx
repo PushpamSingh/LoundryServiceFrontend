@@ -1,22 +1,28 @@
 import {createBrowserRouter, Navigate, RouterProvider} from  'react-router-dom'
 import { Layout } from './Layout/Layout'
-import { Home } from './Pages/Home'
-import { UserDash } from './Pages/UserDash'
-import { PlaceOrder } from './Pages/PlaceOrder'
-import { TrackOrder } from './Pages/TrackOrder'
-import { About } from './Pages/About'
+import { Home } from './Pages/Home/Home'
+import { UserDash } from './Pages/User/UserDash'
+import { PlaceOrder } from './Pages/Placeorder/PlaceOrder'
+import { TrackOrder } from './Pages/Trackorder/TrackOrder'
+import { About } from './Pages/About/About'
 import { AuthLayout } from './Layout/AuthLayout'
-import { Login } from './Pages/Login'
-import { Signup } from './Pages/Signup'
-import { AdminDash } from './Pages/AdminDash'
+import { Login } from './Pages/Login/Login'
+import { Signup } from './Pages/Signup/Signup'
+import { AdminDash } from './Pages/Admin/AdminDash'
 import {useAuthuser} from "./Hooks/useAuthuser"
-import { Onboard } from './Pages/Onboard'
+import { Onboard } from './Pages/Onboard/Onboard'
+import { Payment } from './Pages/PaymentPage/Payment'
+import { usePayment } from './Zustand/usePayment'
+import { useEffect } from 'react'
 function App() {
-  // const {userData,userError,userLoading} =useAuthuser()
-  const role='admin'
-  const isAuthenticated=Boolean(false)
+  // const {userData,userError,userLoading} = useAuthuser()
+  const role='user'
+  const isAuthenticated=Boolean(true)
   // const isOnboarded=userData.onboarded || false
   const isOnboarded=true
+  const {paymentpage}=usePayment()
+ 
+  
 
   const router=createBrowserRouter([
           {
@@ -24,11 +30,14 @@ function App() {
             element:<Layout/>,
             children:[
               {
-                path:'/',
-                element:<Home/>
+                index:true,
+                element:(
+                  isOnboarded?(
+                    <Home/>
+                  ) : <Navigate to={'/onboarding'}/>)
               },
               {
-                path:'/about',
+                path:'about',
                 element:(
                   isAuthenticated ? (
                     isOnboarded?(
@@ -36,9 +45,10 @@ function App() {
                     ) : <Navigate to={'/onboarding'}/>
                   ) : <Navigate to={'/'}/>
                 )
+                // element:<About/>
               },
               {
-                path:'/userdashboard',
+                path:'userdashboard',
                 element:(
                   isAuthenticated ? (
                     isOnboarded && role==="user"? (
@@ -46,9 +56,10 @@ function App() {
                     ): <Navigate to={'/onboarding'}/>
                   ): <Navigate to={'/'}/>
                 )
+                // element:<UserDash/>
               },
               {
-                path:'/admindashboard',
+                path:'admindashboard',
                 element:(
                   isAuthenticated ? (
                     isOnboarded && role==="admin" ? (
@@ -56,9 +67,10 @@ function App() {
                     ) : <Navigate to={'/onboarding'}/>
                   ):<Navigate to={'/'}/>
                 )
+                // element:<AdminDash/>
               },
               {
-                path:'/placeorder',
+                path:'placeorder',
                 element:(
                   isAuthenticated ? (
                     isOnboarded && role==="user"? (
@@ -66,9 +78,21 @@ function App() {
                     ) : <Navigate to={'/onboarding'}/>
                   ):<Navigate to={'/'}/>
                 )
+                // element:<PlaceOrder/>
               },
               {
-                path:'/trackorder',
+                path:'placeorder/payment/:id',
+                element:(
+                  isAuthenticated && paymentpage? (
+                    isOnboarded && role==="user"? (
+                      <Payment/>
+                    ) : <Navigate to={'/onboarding'}/>
+                  ):<Navigate to={'/'}/>
+                )
+                // element:<PlaceOrder/>
+              },
+              {
+                path:'trackorder',
                 element:(
                   isAuthenticated ? (
                     isOnboarded && role==="user" ? (
@@ -76,6 +100,7 @@ function App() {
                     ) : <Navigate to={'/onboarding'}/>
                   ):<Navigate to={'/'}/>
                 )
+                // element:<TrackOrder/>
               }
             ]
           },
@@ -84,7 +109,7 @@ function App() {
             element:<AuthLayout/>,
             children:[
               {
-                path:'/login',
+                path:'login',
                 element:(
                   isAuthenticated ? (
                     !isOnboarded ? (
@@ -94,7 +119,7 @@ function App() {
                 )
               },
               {
-                path:'/signup',
+                path:'signup',
                 element:(
                   isAuthenticated ? (
                     !isOnboarded ? (
@@ -104,7 +129,7 @@ function App() {
                 )
               },
               {
-                path:'/onboarding',
+                path:'onboarding',
                 element:(
                   isAuthenticated ? (
                     !isOnboarded ? (
