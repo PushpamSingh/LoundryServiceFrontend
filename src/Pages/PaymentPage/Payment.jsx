@@ -13,84 +13,94 @@ import { razorpayService } from "../../API/Razorpay.service";
 
 export const Payment = () => {
   const navigate = useNavigate();
-  const { orderId: orderschemaid } = useParams();
+  const { id: orderschemaid } = useParams();
   const queryclient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState("COD");
-  const {mutate:confirmOrdermutation,isPending:confirmOrderpending}=useMutation({
-    mutationFn:async()=>{
-      const response=await orderService.ConfirmOrder({orderId: orderschemaid ,selectedPayment})
-      return response ||null
+  // console.log("orderschemaid :: ", orderschemaid);
+  // console.log("selectedPayment :: ", selectedPayment);
+
+  const { mutate: confirmOrdermutation } = useMutation({
+    mutationFn: async () => {
+      const response = await orderService.ConfirmOrder({
+        orderId: orderschemaid,
+        selectedPayment,
+      });
+      return response || null;
     },
-    onSuccess:()=>{
-      queryclient.invalidateQueries({queryKey:['authUser']})
-      navigate("/userdashboard")
-    }
-  })
-  const {mutate:createRazorpayOrderMutation,isPending:razorpayOrderPending} = useMutation({
+    onSuccess: () => {
+      queryclient.invalidateQueries({ queryKey: ["authUser"] });
+      navigate("/userdashboard");
+    },
+  });
+  const { mutate: createRazorpayOrderMutation } = useMutation({
     mutationFn: async () => {
       const response = await razorpayService.CreateRazorpayOrder({
         orderschemaid,
       });
       return response || null;
     },
-    onSuccess:()=>{
-      queryclient.invalidateQueries({queryKey:['authUser']})
-    }
+    onSuccess: () => {
+      queryclient.invalidateQueries({ queryKey: ["authUser"] });
+    },
   });
 
-  const {mutate:verifyRazorpaymutation,isPending:razorpayVerifyPending}=useMutation({
-    mutationFn:async(Verifyresponse)=>{
+  const { mutate: verifyRazorpaymutation } = useMutation({
+    mutationFn: async (Verifyresponse) => {
       const response = await razorpayService.VerifyRazorpay(Verifyresponse);
-      return response || null
+      return response || null;
     },
-     onSuccess:()=>{
-      queryclient.invalidateQueries({queryKey:['authUser']})
-      navigate("/userdashboard")
-    }
-  })
+    onSuccess: () => {
+      queryclient.invalidateQueries({ queryKey: ["authUser"] });
+      confirmOrdermutation({
+        orderId: orderschemaid,
+        selectedPayment,
+      })
 
-  const initPayment=(order)=>{
+      navigate("/userdashboard");
+    },
+  });
+
+  const initPayment = (order) => {
     try {
-      const options={
+      const options = {
         key: import.meta.env.VITE_RAZORPAY_API_KEY,
         amount: order.amount,
         currency: order.currency,
-        name:'Order Completed',
-        description: 'Payment Comleted',
+        name: "Order Completed",
+        description: "Payment Comleted",
         order_id: order.id,
-         receipt:order.receipt,
-         handler: async(response)=>{
-          verifyRazorpaymutation(response)
-         }
-      }
-      const rzp = new window.razorpay(options)
-      
+        receipt: order.receipt,
+        handler: async (response) => {
+          verifyRazorpaymutation(response);
+        },
+      };
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (error) {
-      toast.error(error.message,{style:{fontSize:'16px'}})
+      toast.error(error.message, { style: { fontSize: "16px" } });
     }
-  }
-  const PaymentHandler = async() => {
+  };
+  const PaymentHandler = async () => {
     try {
       if (selectedPayment === "COD") {
         confirmOrdermutation();
-      }else{
+      } else {
         setLoading(true);
-        const response=await createRazorpayOrderMutation();
-  
-        if(response?.success){
-          initPayment(response?.data)
+        const response = await createRazorpayOrderMutation();
+
+        if (response?.success) {
+          initPayment(response?.data);
         }
-        setLoading(false)
+        setLoading(false);
       }
     } catch (error) {
-      setLoading(false)
-      toast.error(error.message,{style:{fontSize:'16px'}})
+      setLoading(false);
+      toast.error(error.message, { style: { fontSize: "16px" } });
     }
-  }
+  };
 
-
-  // const 
+  // const
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
@@ -129,7 +139,7 @@ export const Payment = () => {
             {/* COD Option */}
             <label
               className={`relative flex items-center p-5 rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-[1.02] ${
-                selectedPayment === "cod"
+                selectedPayment === "COD"
                   ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-200"
                   : "bg-white border-2 border-gray-200 text-gray-700 hover:border-teal-300 hover:shadow-md"
               }`}
@@ -137,8 +147,8 @@ export const Payment = () => {
               <input
                 type="radio"
                 name="payment"
-                value="cod"
-                checked={selectedPayment === "cod"}
+                value="COD"
+                checked={selectedPayment === "COD"}
                 onChange={(e) => setSelectedPayment(e.target.value)}
                 className="sr-only"
               />
@@ -146,12 +156,12 @@ export const Payment = () => {
                 <div className="flex items-center">
                   <div
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 transition-all duration-200 ${
-                      selectedPayment === "cod"
+                      selectedPayment === "COD"
                         ? "border-white bg-white"
                         : "border-gray-300"
                     }`}
                   >
-                    {selectedPayment === "cod" && (
+                    {selectedPayment === "COD" && (
                       <CheckCircle className="w-4 h-4 text-teal-600" />
                     )}
                   </div>
@@ -159,7 +169,7 @@ export const Payment = () => {
                     <div className="font-semibold text-lg">COD</div>
                     <div
                       className={`text-sm ${
-                        selectedPayment === "cod"
+                        selectedPayment === "COD"
                           ? "text-teal-100"
                           : "text-gray-500"
                       }`}
@@ -170,17 +180,17 @@ export const Payment = () => {
                 </div>
                 <div
                   className={`p-2 rounded-lg ${
-                    selectedPayment === "cod" ? "bg-white/20" : "bg-gray-100"
+                    selectedPayment === "COD" ? "bg-white/20" : "bg-gray-100"
                   }`}
                 >
                   <Banknote
                     className={`w-6 h-6 ${
-                      selectedPayment === "cod" ? "text-white" : "text-teal-600"
+                      selectedPayment === "COD" ? "text-white" : "text-teal-600"
                     }`}
                   />
                 </div>
               </div>
-              {selectedPayment === "cod" && (
+              {selectedPayment === "COD" && (
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-400/20 to-teal-600/20 pointer-events-none"></div>
               )}
             </label>
@@ -188,7 +198,7 @@ export const Payment = () => {
             {/* UPI/Card Option */}
             <label
               className={`relative flex items-center p-5 rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-[1.02] ${
-                selectedPayment === "upi"
+                selectedPayment === "Online"
                   ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-200"
                   : "bg-white border-2 border-gray-200 text-gray-700 hover:border-teal-300 hover:shadow-md"
               }`}
@@ -196,8 +206,8 @@ export const Payment = () => {
               <input
                 type="radio"
                 name="payment"
-                value="upi"
-                checked={selectedPayment === "upi"}
+                value="Online"
+                checked={selectedPayment === "Online"}
                 onChange={(e) => setSelectedPayment(e.target.value)}
                 className="sr-only"
               />
@@ -205,12 +215,12 @@ export const Payment = () => {
                 <div className="flex items-center">
                   <div
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 transition-all duration-200 ${
-                      selectedPayment === "upi"
+                      selectedPayment === "Online"
                         ? "border-white bg-white"
                         : "border-gray-300"
                     }`}
                   >
-                    {selectedPayment === "upi" && (
+                    {selectedPayment === "Online" && (
                       <CheckCircle className="w-4 h-4 text-teal-600" />
                     )}
                   </div>
@@ -220,7 +230,7 @@ export const Payment = () => {
                     </div>
                     <div
                       className={`text-sm ${
-                        selectedPayment === "upi"
+                        selectedPayment === "Online"
                           ? "text-teal-100"
                           : "text-gray-500"
                       }`}
@@ -231,17 +241,19 @@ export const Payment = () => {
                 </div>
                 <div
                   className={`p-2 rounded-lg ${
-                    selectedPayment === "upi" ? "bg-white/20" : "bg-gray-100"
+                    selectedPayment === "Online" ? "bg-white/20" : "bg-gray-100"
                   }`}
                 >
                   <CreditCard
                     className={`w-6 h-6 ${
-                      selectedPayment === "upi" ? "text-white" : "text-teal-600"
+                      selectedPayment === "Online"
+                        ? "text-white"
+                        : "text-teal-600"
                     }`}
                   />
                 </div>
               </div>
-              {selectedPayment === "upi" && (
+              {selectedPayment === "Online" && (
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-400/20 to-teal-600/20 pointer-events-none"></div>
               )}
             </label>
@@ -264,9 +276,18 @@ export const Payment = () => {
 
         {/* Pay Button */}
         <div className="p-6 bg-white">
-          <button className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg shadow-teal-200 flex items-center justify-center group cursor-pointer">
-            <span className="text-lg">Pay & Place Order</span>
-            <ArrowLeft className="w-5 h-5 ml-2 rotate-180 group-hover:translate-x-1 transition-transform duration-200" />
+          <button
+            className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg shadow-teal-200 flex items-center justify-center group cursor-pointer"
+            onClick={PaymentHandler}
+          >
+            {loading ? (
+              <span className="text-lg">Processing...</span>
+            ) : (
+              <>
+                <span className="text-lg">Pay & Place Order</span>
+                <ArrowLeft className="w-5 h-5 ml-2 rotate-180 group-hover:translate-x-1 transition-transform duration-200" />
+              </>
+            )}
           </button>
           <p className="text-center text-xs text-gray-500 mt-3 flex items-center justify-center">
             <Shield className="w-3 h-3 mr-1" />

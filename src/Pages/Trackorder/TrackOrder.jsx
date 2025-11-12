@@ -1,7 +1,22 @@
 import { Search } from "lucide-react";
+import { orderService } from "../../API/Order.service";
 
 export const TrackOrder = () => {
-
+const [orderId, setOrderId] = useState("");
+const {data:orderData,isLoading,error} = useQuery({
+  queryKey:["trackedorder",orderId],
+  queryFn:async()=>{
+    const response=await orderService.TrackOrder({orderId});
+    if(response?.data){
+      return response?.data;
+    }else{
+      return null;
+    }
+  },
+  enabled:!!orderId,
+  retry:false
+});
+console.log("orderData :: ", orderData);
   return (
     <div className="px-2 sm:px-4 py-3 sm:py-6">
       <div className="w-full max-w-7xl mx-auto flex flex-col gap-6 sm:gap-8 lg:gap-10">
@@ -18,7 +33,7 @@ export const TrackOrder = () => {
             Enter your order ID to check the status
           </p>
         </div>
-
+   {error && <div className="text-red-500 text-sm font-medium">{error.message}</div>}
         {/* Input Section */}
         <div className="w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto px-4 relative">
           <div className="flex md:flex-row flex-col bg-white rounded-2xl border-2 border-[#0D9488] overflow-hidden">
@@ -30,12 +45,15 @@ export const TrackOrder = () => {
                 type="text"
                 name="orderid"
                 placeholder="e.g. ORD-001 or 9876543210"
+                required
+                value={orderId}
+                onChange={(e)=>setOrderId(e.target.value)}
                 className="text-[#1F2937] w-full outline-none px-4 pt-5 pb-3 text-base border-0 focus:ring-0 bg-transparent"
               />
             </div>
             <button className="bg-[#0D9488] hover:bg-[#0f766e] transition-colors duration-200 flex items-center justify-center gap-2 px-6 py-3 text-white font-medium text-base">
-              <Search className="w-5 h-5" />
-              <span>Track Order</span>
+              {isLoading ? (<span className="loading loading-spinner size-6"></span> ): (<><Search className="w-5 h-5" />
+              <span>Track Order</span></>)}
             </button>
           </div>
         </div>

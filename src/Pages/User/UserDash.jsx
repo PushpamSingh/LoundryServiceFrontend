@@ -6,8 +6,87 @@ import {
   LogOut,
   SlidersHorizontal,
 } from "lucide-react";
+import { userDashService } from "../../API/UserDash.service";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function UserDash() {
+  const [orderStatusCount, setOrderStatusCount] = useState({
+    totalOrders: 0,
+    pendingOrders: 0,
+    pickedOrders: 0,
+    washedOrders: 0,
+    deliveredOrders: 0,
+    paymentHistory: 0,
+  });
+  const queryclient= useQueryClient()
+  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const {data:paymentHistoryData,isLoading:paymentHistoryLoading,error:paymentHistoryError} = useQuery({
+    queryKey:["paymenthistory"],
+    queryFn:async()=>{
+      const response=await userDashService.PaymentHistory();
+      if(response?.data){
+        return response?.data;
+      }else{
+        return null;
+      }
+    }
+  });
+  const {data:allordersData,isLoading:allordersLoading,error:allordersError} = useQuery({
+    queryKey:["allorders"],
+    queryFn:async()=>{
+      const response=await userDashService.AllOrders();
+      if(response?.data){
+        return response?.data;
+      }else{
+        return null;
+      }
+    }
+  });
+  const {data:pendingordersData,isLoading:pendingordersLoading,error:pendingordersError} = useQuery({
+    queryKey:["pendingorders"],
+    queryFn:async()=>{
+      const response=await userDashService.PendingOrders();
+      if(response?.data){
+        return response?.data;
+      }else{
+        return null;
+      }
+    }
+  });
+  const {data:pickedordersData,isLoading:pickedordersLoading,error:pickedordersError} = useQuery({
+    queryKey:["pickedorders"],
+    queryFn:async()=>{
+      const response=await userDashService.PickedOrders();
+      if(response?.data){
+        return response?.data;
+      }else{
+        return null;
+      }
+    }
+  });
+  const {data:washedordersData,isLoading:washedordersLoading,error:washedordersError} = useQuery({
+    queryKey:["washedorders"],
+    queryFn:async()=>{
+      const response=await userDashService.WashedOrders();
+      if(response?.data){
+        return response?.data;
+      }else{
+        return null;
+      }
+    }
+  });
+  const {data:deliveredordersData,isLoading:deliveredordersLoading,error:deliveredordersError} = useQuery({
+    queryKey:["deliveredorders"],
+    queryFn:async()=>{
+      const response=await userDashService.DeliveredOrders();
+      if(response?.data){
+        return response?.data;
+      }else{
+        return null;
+      }
+    }
+  });
   const stats = [
     {
       label: "Total orders",
@@ -39,93 +118,27 @@ export function UserDash() {
     },
   ];
 
-  const orders = [
-    {
-      id: "ORD-003",
-      date: "12/06/2025",
-      status: "pending",
-      statusColor: "bg-yellow-500",
-      customer: { name: "Sarthak Kumar", phone: "+91 9304738462" },
-      order: {
-        items: "item 1, item 2, 3",
-        payment: "completed",
-        pickupDate: "18/06/2025",
-        deliverydate: "19/06/2025",
-      },
-      amount: "₹60",
-    },
-    {
-      id: "ORD-003",
-      date: "12/06/2025",
-      status: "picked",
-      statusColor: "bg-green-500",
-      customer: { name: "Pushpam Singh", phone: "+91 9304738462" },
-      order: {
-        items: "item 1, item 2, 3",
-        payment: "completed",
-        pickupDate: "18/06/2025",
-        deliverydate: "19/06/2025",
-      },
-      amount: "₹60",
-    },
+const {data:totalorderStatusCount,isLoading,error} = useQuery({
+  queryKey:["totalorderstatuscount"],
+  queryFn:async()=>{
+    const response=await userDashService.TotalorderStatusCount();
+    if(response?.data){
+      setOrderStatusCount(response?.data);
+      return response?.data;
+    }else{
+      setOrderStatusCount({
+        totalOrders: 0,
+        pendingOrders: 0,
+        pickedOrders: 0,
+        washedOrders: 0,
+        deliveredOrders: 0,
+        paymentHistory: 0,
+      });
+      return null;
+    }
+  }
+});
 
-    {
-      id: "ORD-002",
-      date: "12/06/2025",
-      status: "washed",
-      statusColor: "bg-green-500",
-      customer: { name: "Purnesh Singh", phone: "+91 9304738462" },
-      order: {
-        items: "item 1, item 2, 3",
-        payment: "completed",
-        pickupDate: "18/06/2025",
-        deliverydate: "19/06/2025",
-      },
-      amount: "₹60",
-    },
-    {
-      id: "ORD-002",
-      date: "12/06/2025",
-      status: "picked",
-      statusColor: "bg-green-500",
-      customer: { name: "Pushpam Singh", phone: "+91 9304738462" },
-      order: {
-        items: "item 1, item 2, 3",
-        payment: "completed",
-        pickupDate: "01/04/2025",
-        deliverydate: "19/06/2025",
-      },
-      amount: "₹60",
-    },
-    {
-      id: "ORD-003",
-      date: "12/06/2025",
-      status: "pending",
-      statusColor: "bg-yellow-500",
-      customer: { name: "Pushpam Singh", phone: "+91 9304738462" },
-      order: {
-        items: "item 1, item 2, 3",
-        payment: "completed",
-        pickupDate: "18/06/2025",
-        deliverydate: "19/06/2025",
-      },
-      amount: "₹60",
-    },
-    {
-      id: "ORD-002",
-      date: "12/06/2025",
-      status: "delivered",
-      statusColor: "bg-blue-500",
-      customer: { name: "Pushpam Singh", phone: "+91 9304738462" },
-      order: {
-        items: "item 1, item 2, 3",
-        payment: "completed",
-        pickupDate: "01/04/2025",
-        deliverydate: "19/06/2025",
-      },
-      amount: "₹60",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
@@ -188,22 +201,52 @@ export function UserDash() {
             </h2>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button className="px-5 py-2 bg-teal-500 text-white rounded-full font-medium hover:bg-teal-600 transition-colors">
-              All Orders (3)
+            <button className="px-5 py-2 bg-teal-500 text-white rounded-full font-medium hover:bg-teal-600 transition-colors"
+            onClick={()=>{
+              queryclient.invalidateQueries({queryKey:['allorders']})
+              setOrders(allordersData)
+            }}
+            >
+              All Orders ({orderStatusCount.totalOrders})
             </button>
-            <button className="px-5 py-2 bg-white border-2 border-yellow-500 text-yellow-500 rounded-full font-medium hover:bg-yellow-50 transition-colors">
-              Pending (3)
+            <button className="px-5 py-2 bg-white border-2 border-yellow-500 text-yellow-500 rounded-full font-medium hover:bg-yellow-50 transition-colors"
+            onClick={()=>{
+              queryclient.invalidateQueries({queryKey:['pendingorders']})
+              setOrders(pendingordersData)
+            }}
+            >
+              Pending ({orderStatusCount.pendingOrders})
             </button>
-            <button className="px-5 py-2 bg-white border-2 border-green-500 text-green-500 rounded-full font-medium hover:bg-green-50 transition-colors">
-              Picked (3)
+            <button className="px-5 py-2 bg-white border-2 border-green-500 text-green-500 rounded-full font-medium hover:bg-green-50 transition-colors"
+            onClick={()=>{
+              queryclient.invalidateQueries({queryKey:['pickedorders']})
+              setOrders(pickedordersData)
+            }}
+            >
+              Picked ({orderStatusCount.pickedOrders})
             </button>
-            <button className="px-5 py-2 bg-white border-2 border-green-500 text-green-500 rounded-full font-medium hover:bg-green-50 transition-colors">
-              Washed (3)
+            <button className="px-5 py-2 bg-white border-2 border-green-500 text-green-500 rounded-full font-medium hover:bg-green-50 transition-colors"
+            onClick={()=>{
+              queryclient.invalidateQueries({queryKey:['washedorders']})
+              setOrders(washedordersData)
+            }}
+            >
+              Washed ({orderStatusCount.washedOrders})
             </button>
-            <button className="px-5 py-2 bg-white border-2 border-blue-500 text-blue-500 rounded-full font-medium hover:bg-blue-50 transition-colors">
-              Delivered (3)
+            <button className="px-5 py-2 bg-white border-2 border-blue-500 text-blue-500 rounded-full font-medium hover:bg-blue-50 transition-colors"
+            onClick={()=>{
+              queryclient.invalidateQueries({queryKey:['deliveredorders']})
+              setOrders(deliveredordersData)
+            }}
+            >
+              Delivered ({orderStatusCount.deliveredOrders})
             </button>
-            <button className="px-5 py-2 bg-white border-2 border-gray-800 text-gray-800 rounded-full font-medium hover:bg-gray-50 transition-colors">
+            <button className="px-5 py-2 bg-white border-2 border-gray-800 text-gray-800 rounded-full font-medium hover:bg-gray-50 transition-colors"
+            onClick={()=>{
+              queryclient.invalidateQueries({queryKey:['paymenthistory']})
+              setPaymentHistory(paymentHistory)
+            }}
+            >
               Payment History
             </button>
           </div>
@@ -218,11 +261,11 @@ export function UserDash() {
             >
               {/* Order Header */}
               <div
-                className={`${order.statusColor} px-4 py-3 flex justify-between items-center`}
+                className={`${order.status==='pending' ? 'bg-yellow-500' : order.status==='picked' ? 'bg-green-500' : order.status==='washed' ? 'bg-green-500' : order.status==='delivered' ? 'bg-blue-500' : 'bg-gray-500'} px-4 py-3 flex justify-between items-center`}
               >
                 <div>
                   <p className="text-white text-sm font-medium">
-                    Order: {order.id}
+                    Order: {order.orderId}
                   </p>
                   <p className="text-white text-xs opacity-90">
                     Created on {order.date}
@@ -245,13 +288,13 @@ export function UserDash() {
                       <div className="flex items-center gap-2">
                         <p className="text-xs text-gray-500">Name:</p>
                         <p className="text-xs font-medium text-gray-800">
-                          {order.customer.name}
+                          {order.fullname}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
                         <p className="text-xs text-gray-500">Phone:</p>
                         <p className="text-xs font-medium text-gray-800">
-                          {order.customer.phone}
+                          {order.phone}
                         </p>
                       </div>
                     </div>

@@ -53,6 +53,19 @@ class AuthService{
             throw new Error(error.response?.data?.message || "Logout failed");
         }
     }
+    async OnboardUser(){
+        try {
+            const response=await API.put('/onboarduser',{headers:{Authorization: `Bearer ${token}`}})
+            if(response?.data){
+                return response?.data
+            }else{
+                return null
+            }
+        } catch (error) {
+            console.log("OnboardUser :: Error :: ",error);
+            throw new Error(error.response?.data?.message || "Onboard failed");
+        }
+    }
     async getCurrentUser(){
         try {
             const response=await API.get('/getcurrentuser',{headers:{Authorization: `Bearer ${token}`}})

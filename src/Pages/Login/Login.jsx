@@ -1,13 +1,37 @@
-import { Link } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate } from "react-router-dom";
+import { authService } from "../../API/User.service";
+import { useState } from "react";
 
 export const Login = () => {
+  const navigate = useNavigate();
+  const [logindata, setLogindata] = useState({
+    email: "",
+    password: "",
+  });
+  const queryclient = useQueryClient();
+
+  const {mutate:Loginmutation,isPending,error} = useMutation({
+    mutationFn: async () => {
+      const response = await authService.LoginUser(logindata);
+      return response?.data ? response.data : null;
+    },
+    onSuccess: () => {
+      queryclient.invalidateQueries({ queryKey: ["authUser"] });
+      navigate("/");
+    }
+  });
+  const handleLogin = (e) => {
+    e.preventDefault();
+    Loginmutation();
+  }
   return (
     <div className="px-4 py-3 sm:mx-2">
       <div className="w-full lg:w-[100%] p-3 mx-auto flex flex-col gap-10 items-center rounded-xs">
         <div className="bg-gradient-to-br from-[#0d948981] to-[#0d948978] rounded-3xl p-3 md:p-8">
           <div className="bg-[#0D9488] rounded-2xl md:p-12 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             {/* Left Side - Form */}
-            <div className="bg-white rounded-2xl p-4 md:p-8 shadow-xl">
+            <form className="bg-white rounded-2xl p-4 md:p-8 shadow-xl" onSubmit={handleLogin}>
               {/* Logo */}
               <div className="flex items-center gap-2 mb-8 bg-teal-600 p-2">
                 <img src="./clean-clothes.png" alt=""  className="w-6 h-6"/>
@@ -24,6 +48,11 @@ export const Login = () => {
                 <p className="text-sm text-[#1F2937]">
                   Sign in to your account and enjoy laundry service
                 </p>
+                {error && (
+                  <p className="text-sm text-red-600 mt-2">
+                    {error.message || "Login failed. Please try again."}
+                  </p>
+                )}
               </div>
 
               {/* Email Field */}
@@ -47,8 +76,13 @@ export const Login = () => {
                   </svg>
                   <input
                   required
+                  name="email"
                     type="email"
                     placeholder="Your Email"
+                    value={logindata.email}
+                    onChange={(e) =>
+                      setLogindata({ ...logindata, email: e.target.value })
+                    }
                     className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-[#1F2937] placeholder-gray-400"
                   />
                 </div>
@@ -75,8 +109,13 @@ export const Login = () => {
                   </svg>
                   <input
                   required
+                  name="password"
                     type="password"
                     placeholder="Your Password"
+                    value={logindata.password}
+                    onChange={(e) =>
+                      setLogindata({ ...logindata, password: e.target.value })
+                    }
                     className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D9488] focus:border-transparent text-gray-900 placeholder-gray-400"
                   />
                 </div>
@@ -99,8 +138,10 @@ export const Login = () => {
               </div>
 
               {/* Sign In Button */}
-              <button className="w-full bg-[#0D9488] hover:bg-[#0D9488] text-white font-semibold py-3 rounded-lg transition duration-200 mb-4 cursor-pointer">
-                Sign In
+              <button className="w-full bg-[#0D9488] hover:bg-[#0D9488] text-white font-semibold py-3 rounded-lg transition duration-200 mb-4 cursor-pointer"
+              type="submit"
+              >
+                {isPending ? (<span className="loading loading-spinner size-6"></span> ): ("Sign In")}
               </button>
 
               {/* Create Account Link */}
@@ -110,7 +151,7 @@ export const Login = () => {
                   Create one
                 </Link>
               </p>
-            </div>
+            </form>
 
             {/* Right Side - Illustration */}
             <div className="hidden lg:flex items-center justify-center">

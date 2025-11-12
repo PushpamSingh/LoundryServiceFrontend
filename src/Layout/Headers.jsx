@@ -3,9 +3,10 @@ import {useAuthuser} from "./../Hooks/useAuthuser"
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 export const Header=()=>{
-    // const {userData} = useAuthuser();
+    const {userData} = useAuthuser();
     const [mobileView,setMobileView]=useState(false)
-    const authStatus=true
+    const authStatus=Boolean(userData)
+    const role=userData?.role || null
 
     const navItem=[
         {
@@ -24,7 +25,7 @@ export const Header=()=>{
             name:"PlaceOrder",
             icon:<ShoppingCart className="text-white md:size-6 size-4"/>,
             slug:"/placeorder",
-            active:authStatus
+            active:authStatus && role==="user"
         },
         {
             name:"TrackOrder",
@@ -42,7 +43,7 @@ export const Header=()=>{
             name:"SignUp",
             icon:<User className="text-white md:size-6 size-4"/>,
             slug:"/signup",
-            active:!authStatus
+            active:!authStatus 
         }
        
     ]
