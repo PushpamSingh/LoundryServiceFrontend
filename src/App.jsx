@@ -43,10 +43,10 @@ function App() {
             isOnboarded ? (
               <About />
             ) : (
-              <Navigate to={"/onboarding"} />
+              <Navigate to={"/onboarding"} replace />
             )
           ) : (
-            <Navigate to={"/"} />
+            <Navigate to={"/"} replace />
           ),
           // element:<About/>
         },
@@ -56,10 +56,10 @@ function App() {
             isOnboarded && role === "user" ? (
               <UserDash />
             ) : (
-              <Navigate to={"/onboarding"} />
+              <Navigate to={"/onboarding"} replace />
             )
           ) : (
-            <Navigate to={"/"} />
+            <Navigate to={"/"} replace />
           ),
           // element:<UserDash/>
         },
@@ -69,10 +69,10 @@ function App() {
             isOnboarded && role === "admin" ? (
               <AdminDash />
             ) : (
-              <Navigate to={"/onboarding"} />
+              <Navigate to={"/onboarding"} replace />
             )
           ) : (
-            <Navigate to={"/"} />
+            <Navigate to={"/"} replace />
           ),
           // element:<AdminDash/>
         },
@@ -82,10 +82,10 @@ function App() {
             isOnboarded && role === "user" ? (
               <PlaceOrder />
             ) : (
-              <Navigate to={"/onboarding"} />
+              <Navigate to={"/onboarding"} replace />
             )
           ) : (
-            <Navigate to={"/"} />
+            <Navigate to={"/"} replace />
           ),
           // element:<PlaceOrder/>
         },
@@ -96,10 +96,10 @@ function App() {
               isOnboarded && role === "user" ? (
                 <Payment />
               ) : (
-                <Navigate to={"/onboarding"} />
+                <Navigate to={"/onboarding"} replace />
               )
             ) : (
-              <Navigate to={"/"} />
+              <Navigate to={"/"} replace />
             ),
           // element:<PlaceOrder/>
         },
@@ -109,10 +109,10 @@ function App() {
             isOnboarded ? (
               <TrackOrder />
             ) : (
-              <Navigate to={"/onboarding"} />
+              <Navigate to={"/onboarding"} replace />
             )
           ) : (
-            <Navigate to={"/"} />
+            <Navigate to={"/"} replace />
           ),
           // element:<TrackOrder/>
         },
@@ -126,9 +126,9 @@ function App() {
           path: "login",
           element: isAuthenticated ? (
             !isOnboarded ? (
-              <Navigate to={"/onboarding"} />
+              <Navigate to={"/onboarding"} replace />
             ) : (
-              <Navigate to={"/"} />
+              <Navigate to={"/"} replace />
             )
           ) : (
             <Login />
@@ -138,9 +138,9 @@ function App() {
           path: "signup",
           element: isAuthenticated ? (
             !isOnboarded ? (
-              <Navigate to={"/onboarding"} />
+              <Navigate to={"/onboarding"} replace />
             ) : (
-              <Navigate to={"/"} />
+              <Navigate to={"/"} replace />
             )
           ) : (
             <Signup />
@@ -152,15 +152,28 @@ function App() {
             !isOnboarded ? (
               <Onboard />
             ) : (
-              <Navigate to={"/"} />
+              <Navigate to={"/"} replace />
             )
           ) : (
-            <Navigate to={"/login"} />
+            <Navigate to={"/login"} replace />
           ),
         },
       ],
     },
   ]);
+
+  if (userLoading) {
+    return (
+      <div className="w-screen h-screen flex justify-center items-center">
+        <div className="loader">
+          <div className="circle"></div>
+          <div className="circle"></div>
+          <div className="circle"></div>
+          <div className="circle"></div>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <RouterProvider router={router} />
