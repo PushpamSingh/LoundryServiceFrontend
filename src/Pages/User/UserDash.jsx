@@ -18,7 +18,7 @@ import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/re
 // import { toast } from "sonner"; // <-- added because you call toast
 
 export function UserDash() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   const [orderStatusCount, setOrderStatusCount] = useState({
     totalOrders: 0,
     pending: 0,
