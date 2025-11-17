@@ -50,7 +50,7 @@ export const Home = () => {
       <div className="w-full lg:w-[100%] p-3 mx-auto flex flex-col gap-10 items-center rounded-xs">
         {/* SparkleClean Section */}
         <section className="bg-white w-full text-center flex flex-col gap-10 rounded-xs py-4 max-md:px-4">
-          <div className="w-full text-2xl text-[#1F2937] sm:text-3xl md:text-5xl lg:text-7xl font-bold md:w-[90%] lg:w-[55%] mx-auto md:leading-20 lg:leading-24">
+          <div className="w-full text-2xl text-[#1F2937] sm:text-3xl md:text-5xl lg:text-6xl font-extrabold md:w-[90%] lg:w-[55%] mx-auto md:leading-20 lg:leading-24">
             <h1>Welcome to SparkleClean Laundry</h1>
           </div>
           <div className="text-[#777373] md:text-2xl lg:text-3xl font-bold md:w-[90%] lg:w-[60%] mx-auto">

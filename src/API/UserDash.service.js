@@ -17,8 +17,22 @@ class UserDashService{
                 return null
             }
         } catch (error) {
-            console.log("TotalorderStatusCount :: Error :: ",error);
+            // console.log("TotalorderStatusCount :: Error :: ",error);
             throw new Error(error.response?.data?.message || "TotalorderStatusCount failed");
+        }
+    }
+    async AllOrders(){
+        try {
+            const response=await API.get('/allorders',{headers:{Authorization:`Bearer ${token}`}})
+            if(response?.data){
+                return response.data
+            }
+            else{
+                return null
+            }
+        } catch (error) {
+            // console.log("AllOrders :: Error :: ",error);
+            throw new Error(error.response?.data?.message || "AllOrders failed");
         }
     }
     async PendingOrders(){
@@ -30,7 +44,7 @@ class UserDashService{
                 return null
             }
         } catch (error) {
-            console.log("PendingOrders :: Error :: ",error);
+            // console.log("PendingOrders :: Error :: ",error);
             throw new Error(error.response?.data?.message || "PendingOrders failed");
         }
     }
@@ -43,7 +57,7 @@ class UserDashService{
                 return null
             }
         } catch (error) {
-            console.log("PickedOrders :: Error :: ",error);
+            // console.log("PickedOrders :: Error :: ",error);
             throw new Error(error.response?.data?.message || "PickedOrders failed");
         }
     }
@@ -56,7 +70,7 @@ class UserDashService{
                 return null
             }
         } catch (error) {
-            console.log("WashedOrders :: Error :: ",error);
+            // console.log("WashedOrders :: Error :: ",error);
             throw new Error(error.response?.data?.message || "WashedOrders failed");
         }
     }
@@ -69,10 +83,11 @@ class UserDashService{
                 return null
             }
         } catch (error) {
-            console.log("DeliveredOrders :: Error :: ",error);
+            // console.log("DeliveredOrders :: Error :: ",error);
             throw new Error(error.response?.data?.message || "DeliveredOrders failed");
         }
     }
+    
     async PaymentHistory(){
         try {
             const response=await API.get('/paymenthistory',{headers:{Authorization:`Bearer ${token}`}})
@@ -82,7 +97,7 @@ class UserDashService{
                 return null
             }
         } catch (error) {
-            console.log("Paymenthistory :: Error :: ",error);
+            // console.log("Paymenthistory :: Error :: ",error);
             throw new Error(error.response?.data?.message || "Paymenthistory failed");
         }
     }

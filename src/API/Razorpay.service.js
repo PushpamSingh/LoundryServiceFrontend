@@ -16,20 +16,20 @@ class RazorpayService{
              return null
          }
        } catch (error) {
-            console.log("CreateRazorpay :: Error :: ",error);
+            // console.log("CreateRazorpay :: Error :: ",error);
             throw new Error(error.response?.data?.message || "payment failed");
        }
     }
     async VerifyRazorpay(Verifyresponse){
         try {
-            const response = await API.get('/verifyrazorpay',Verifyresponse,{headers:{Authorization: `Bearer ${token}`}})
+            const response = await API.post('/verifyrazorpay',Verifyresponse,{headers:{Authorization: `Bearer ${token}`}})
             if(response?.data){
                 return response.data;
             }else{
                 return null
             }
         } catch (error) {
-             console.log("VerifyRazorpay :: Error :: ",error);
+            //  console.log("VerifyRazorpay :: Error :: ",error);
             throw new Error(error.response?.data?.message || "payment failed");
         }
     }

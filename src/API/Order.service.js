@@ -20,7 +20,7 @@ class OrderService {
                 return null
             }
         } catch (error) {
-            console.log("CreateOrder :: Error :: ", error);
+            // console.log("CreateOrder :: Error :: ", error);
             throw new Error(error.response?.data?.message || "create order failed");
         }
     }
@@ -33,20 +33,22 @@ class OrderService {
                 return null
             }
         } catch (error) {
-            console.log("CreateOrder :: Error :: ", error);
+            // console.log("CreateOrder :: Error :: ", error);
             throw new Error(error.response?.data?.message || "create order failed");
         }
     }
     async TrackOrder({ orderId }) {
         try {
-            const response = await API.get('/trackorder', { orderId }, { headers: { Authorization: `Bearer ${token}` } })
+            // console.log("track orderid: ",orderId);
+            
+            const response = await API.post('/trackorder', { orderId }, { headers: { Authorization: `Bearer ${token}` } })
             if (response?.data) {
                 return response?.data
             } else {
                 return null
             }
         } catch (error) {
-            console.log("TrackOrder :: Error :: ", error);
+            // console.log("TrackOrder :: Error :: ", error);
             throw new Error(error.response?.data?.message || "track order failed");
         }
     }
@@ -59,7 +61,7 @@ class OrderService {
                 return null
             }
         } catch (error) {
-            console.log("CanceleOrder :: Error :: ", error);
+            // console.log("CanceleOrder :: Error :: ", error);
             throw new Error(error.response?.data?.message || "cancele order failed");
         }
     }
@@ -72,7 +74,7 @@ class OrderService {
                 return null
             }
         } catch (error) {
-            console.log("Updatepickuptime :: Error :: ", error);
+            // console.log("Updatepickuptime :: Error :: ", error);
             throw new Error(error.response?.data?.message || "pickup time update failed");
         }
     }
@@ -85,7 +87,7 @@ class OrderService {
                 return null
             }
         } catch (error) {
-            console.log("Updatedeliverytime :: Error :: ", error);
+            // console.log("Updatedeliverytime :: Error :: ", error);
             throw new Error(error.response?.data?.message || "delivery time update failed");
         }
     }
@@ -98,7 +100,7 @@ class OrderService {
                 return null
             }
         } catch (error) {
-            console.log("Updatestatus :: Error :: ", error);
+            // console.log("Updatestatus :: Error :: ", error);
             throw new Error(error.response?.data?.message || "status update failed");
         }
     }
@@ -111,7 +113,7 @@ class OrderService {
                 return null
             }
         } catch (error) {
-            console.log("GetOneOrder :: Error :: ", error);
+            // console.log("GetOneOrder :: Error :: ", error);
             throw new Error(error.response?.data?.message || "get one order failed");
         }
     }

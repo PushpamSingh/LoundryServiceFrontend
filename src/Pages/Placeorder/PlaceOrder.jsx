@@ -1,36 +1,36 @@
 import { CalendarIcon, MinusIcon, PlusIcon } from "lucide-react";
-import { usePayment } from "../../Zustand/usePayment";
+import { usePayment } from "../../store/usePayment";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import {orderService} from "../../API/Order.service";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { orderService } from "../../API/Order.service";
 import { toast } from "sonner";
 
 export const PlaceOrder = () => {
-  const {paymentpage,handlePaymentpage}=usePayment()
-  const [orderId,setOrderId]=useState(null)
-  const navigate=useNavigate()
-  const [orderDetails,setOrderDetails]=useState({
-    orderitem:{
-      shirt:0,
-      pants:0,
-      dresses:0,
-      suits:0,
-      bedsheets:0,
-      blankets:0,
+  const { paymentpage, handlePaymentpage } = usePayment();
+  const [orderId, setOrderId] = useState(null);
+  const navigate = useNavigate();
+  const [orderDetails, setOrderDetails] = useState({
+    orderitem: {
+      shirt: 0,
+      pants: 0,
+      dresses: 0,
+      suits: 0,
+      bedsheets: 0,
+      blankets: 0,
     },
-    name:'',
-    phone:'',
-    area:'',
-    alternatephone:'',
-    housenumber:'',
-    city:'',
-    state:'',
-    pincode:'',
-    nearby:'',
-    instructions:''
-  })
-  const[totalPrice,setTotalPrice]=useState(0)
+    name: "",
+    phone: "",
+    area: "",
+    alternatephone: "",
+    housenumber: "",
+    city: "",
+    state: "",
+    pincode: "",
+    nearby: "",
+    instructions: "",
+  });
+  const [totalPrice, setTotalPrice] = useState(0);
   const items = [
     { key: "shirt", label: "Shirts", price: 15 },
     { key: "pants", label: "Pants", price: 15 },
@@ -39,77 +39,92 @@ export const PlaceOrder = () => {
     { key: "bedsheets", label: "Bedsheets", price: 10 },
     { key: "blankets", label: "Blankets Or Quilts", price: 40 },
   ];
-  const price={
-    shirt:15,
-    pants:15,
-    dresses:20,
-    suits:35,
-    bedsheets:10,
-    blankets:40
-  }
-const {mutate:CreateOrdermutation,isPending} = useMutation({
-  mutationFn:async()=>{
-    const response=await orderService.CreateOrder(orderDetails)
-    if(response?.data){
-      setOrderId(response?.data?._id)
-      return response?.data
-    }else{
-      return null
-    }
-  },
-  onSuccess:()=>{
-    toast.success("order created!!",{style:{fontSize:"16px"}})
-    handlePaymentpage()
-  }
-})
-  const handleCreateOrder=(e)=>{
-    e.preventDefault()
-   try {
-     CreateOrdermutation()
-    //  console.log("heelo done");
-   } catch (error) {
-    throw error;
-   }
-  }
-  useEffect(()=>{
-    if(paymentpage){
-      navigate(`/placeorder/payment/${orderId}`)
-    }else{
-      navigate("/placeorder")
-    }
-  },[paymentpage])
-  
-  const handlePlus=(e,key)=>{
-    setOrderDetails((prev)=>{
-      return {
-        ...prev,
-        orderitem: {
-          ...prev.orderitem,
-          [key]: prev.orderitem[key] + 1
-        }
+  const price = {
+    shirt: 15,
+    pants: 15,
+    dresses: 20,
+    suits: 35,
+    bedsheets: 10,
+    blankets: 40,
+  };
+  const queryclient = useQueryClient();
+  const { mutate: CreateOrdermutation, isPending } = useMutation({
+    mutationFn: async () => {
+      const response = await orderService.CreateOrder(orderDetails);
+      if (response?.data) {
+        // console.log(response?.data);
+        
+        setOrderId(response?.data?.order?._id);
+        return response?.data;
+      } else {
+        return null;
       }
-    })
-    setTotalPrice(totalPrice+price[key])
-  }
-  // console.log("Total: ",totalPrice);
+    },
+    onSuccess: () => {
+      queryclient.invalidateQueries({ queryKey: ["allorders"] });
+      queryclient.invalidateQueries({ queryKey: ["totalorderstatuscount"] });
+      queryclient.invalidateQueries({
+        queryKey: ["usertotalorderstatuscount"],
+      });
+      queryclient.invalidateQueries({ queryKey: ["userallorders"] });
+      queryclient.invalidateQueries({ queryKey: ["userpaymenthistory"] });
+      queryclient.invalidateQueries({ queryKey: ["trackedorder"] });
+      toast.success("order created!!", { style: { fontSize: "16px" } });
+      handlePaymentpage();
+    },
+  });
+  // console.log("orderId: ",orderId);
+  // console.log("payment: ",paymentpage);
   
+  const handleCreateOrder = (e) => {
+    e.preventDefault();
+    try {
+      CreateOrdermutation();
+      //  console.log("heelo done");
+    } catch (error) {
+      throw error;
+    }
+  };
+  useEffect(() => {
+    if (paymentpage && orderId) {
+      navigate(`/placeorder/payment/${orderId}`);
+    }
+  }, [paymentpage,orderId]);
 
-  const handleMinus=(e,key)=>{
-    setOrderDetails((prev)=>{
+  const handlePlus = (e, key) => {
+    setOrderDetails((prev) => {
       return {
         ...prev,
         orderitem: {
           ...prev.orderitem,
-          [key]: Math.max(0, prev.orderitem[key] - 1)
-        }
-      }
-    })
-    setTotalPrice(totalPrice-price[key])
-  }
-  
+          [key]: prev.orderitem[key] + 1,
+        },
+      };
+    });
+    setTotalPrice(totalPrice + price[key]);
+  };
+  // console.log("Total: ",totalPrice);
+
+  const handleMinus = (e, key) => {
+    setOrderDetails((prev) => {
+      return {
+        ...prev,
+        orderitem: {
+          ...prev.orderitem,
+          [key]: Math.max(0, prev.orderitem[key] - 1),
+        },
+      };
+    });
+    setTotalPrice(totalPrice - price[key]);
+  };
+
   return (
     <div className="px-4 py-3 sm:mx-2">
-      <form onSubmit={(e)=>handleCreateOrder(e)} action='submit' className="w-full lg:w-[100%] p-3 mx-auto flex flex-col gap-10 ite ms-center rounded-xs">
+      <form
+        onSubmit={(e) => handleCreateOrder(e)}
+        action="submit"
+        className="w-full lg:w-[100%] p-3 mx-auto flex flex-col gap-10 ite ms-center rounded-xs"
+      >
         <header>
           <p className="text-center text-3xl font-bold text-[#1F2937]">
             Create New Order
@@ -142,17 +157,18 @@ const {mutate:CreateOrdermutation,isPending} = useMutation({
                       variant="outline"
                       size="icon"
                       className=" rounded-full border border-[#1F2937] text-[#1F2937] hover:border-[#0D9488] hover:text-white hover:bg-[#0D9488] p-2 cursor-pointer"
-                      onClick={(e)=>handleMinus(e,item.key)}
-                      
+                      onClick={(e) => handleMinus(e, item.key)}
                     >
                       <MinusIcon></MinusIcon>
                     </div>
-                    <span className="font-semibold text-[#1F2937] p-2">{orderDetails.orderitem[item.key]}</span>
+                    <span className="font-semibold text-[#1F2937] p-2">
+                      {orderDetails.orderitem[item.key]}
+                    </span>
                     <div
                       variant="outline"
                       size="icon"
                       className=" rounded-full bg-[#0D9488] border border-[#0D9488] hover:text-[#1F2937] hover:bg-teal-50 p-2 cursor-pointer text-white"
-                    onClick={(e)=>handlePlus(e,item.key)}
+                      onClick={(e) => handlePlus(e, item.key)}
                     >
                       <PlusIcon></PlusIcon>
                     </div>
@@ -180,7 +196,9 @@ const {mutate:CreateOrdermutation,isPending} = useMutation({
                   placeholder="your fullname..."
                   required
                   value={orderDetails.name}
-                  onChange={(e)=>{setOrderDetails({...orderDetails,name:e.target.value})}}
+                  onChange={(e) => {
+                    setOrderDetails({ ...orderDetails, name: e.target.value });
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-4">
@@ -193,7 +211,9 @@ const {mutate:CreateOrdermutation,isPending} = useMutation({
                   placeholder="area/colony name..."
                   required
                   value={orderDetails.area}
-                  onChange={(e)=>{setOrderDetails({...orderDetails,area:e.target.value})}}
+                  onChange={(e) => {
+                    setOrderDetails({ ...orderDetails, area: e.target.value });
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-4">
@@ -209,7 +229,12 @@ const {mutate:CreateOrdermutation,isPending} = useMutation({
                   placeholder="House No./building name..."
                   required
                   value={orderDetails.housenumber}
-                  onChange={(e)=>{setOrderDetails({...orderDetails,housenumber:e.target.value})}}
+                  onChange={(e) => {
+                    setOrderDetails({
+                      ...orderDetails,
+                      housenumber: e.target.value,
+                    });
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-4">
@@ -222,7 +247,9 @@ const {mutate:CreateOrdermutation,isPending} = useMutation({
                   placeholder="your city..."
                   required
                   value={orderDetails.city}
-                  onChange={(e)=>{setOrderDetails({...orderDetails,city:e.target.value})}}
+                  onChange={(e) => {
+                    setOrderDetails({ ...orderDetails, city: e.target.value });
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-4">
@@ -235,7 +262,9 @@ const {mutate:CreateOrdermutation,isPending} = useMutation({
                   placeholder="your phone..."
                   required
                   value={orderDetails.phone}
-                  onChange={(e)=>{setOrderDetails({...orderDetails,phone:e.target.value})}}
+                  onChange={(e) => {
+                    setOrderDetails({ ...orderDetails, phone: e.target.value });
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-4">
@@ -248,7 +277,9 @@ const {mutate:CreateOrdermutation,isPending} = useMutation({
                   placeholder="your state.."
                   required
                   value={orderDetails.state}
-                  onChange={(e)=>{setOrderDetails({...orderDetails,state:e.target.value})}}
+                  onChange={(e) => {
+                    setOrderDetails({ ...orderDetails, state: e.target.value });
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-4">
@@ -261,7 +292,12 @@ const {mutate:CreateOrdermutation,isPending} = useMutation({
                   placeholder="your alternative number..."
                   required
                   value={orderDetails.alternatephone}
-                  onChange={(e)=>{setOrderDetails({...orderDetails,alternatephone:e.target.value})}}
+                  onChange={(e) => {
+                    setOrderDetails({
+                      ...orderDetails,
+                      alternatephone: e.target.value,
+                    });
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-4">
@@ -277,7 +313,12 @@ const {mutate:CreateOrdermutation,isPending} = useMutation({
                   placeholder="area pincode..."
                   required
                   value={orderDetails.pincode}
-                  onChange={(e)=>{setOrderDetails({...orderDetails,pincode:e.target.value})}}
+                  onChange={(e) => {
+                    setOrderDetails({
+                      ...orderDetails,
+                      pincode: e.target.value,
+                    });
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-2 sm:col-span-2">
@@ -293,17 +334,22 @@ const {mutate:CreateOrdermutation,isPending} = useMutation({
                   placeholder="office/mall/shop/appartment name..."
                   required
                   value={orderDetails.nearby}
-                  onChange={(e)=>{setOrderDetails({...orderDetails,nearby:e.target.value})}}
+                  onChange={(e) => {
+                    setOrderDetails({
+                      ...orderDetails,
+                      nearby: e.target.value,
+                    });
+                  }}
                 />
               </div>
             </div>
           </div>
         </section>
-        
+
         {/* instructions section */}
         <section className="bg-white w-full flex flex-col rounded-xs py-4 max-md:px-4">
           <div className="w-full sm:w-[70%] mx-auto">
-          <h2 className="font-semibold mb-3 text-2xl text-[#1F2937]">
+            <h2 className="font-semibold mb-3 text-2xl text-[#1F2937]">
               Special Instructions
             </h2>
             <textarea
@@ -311,53 +357,52 @@ const {mutate:CreateOrdermutation,isPending} = useMutation({
               placeholder="Add any special instructions (e.g., delicate wash, extra starch, fabric softener...)"
               className="w-full outline-none text-[#1F2937] border border-[#0D9488] focus-visible:ring-teal-500 p-2 shadow-lg rounded-lg"
               value={orderDetails.instructions}
-              onChange={(e)=>{setOrderDetails({...orderDetails,instructions:e.target.value})}}
+              onChange={(e) => {
+                setOrderDetails({
+                  ...orderDetails,
+                  instructions: e.target.value,
+                });
+              }}
             />
           </div>
         </section>
 
         <section className="bg-white w-full flex flex-col rounded-xs py-4 max-md:px-4">
-        <div className="w-full sm:w-[70%] mx-auto">
-        <h2 className="font-semibold mb-3 text-2xl text-[#1F2937]">Order Summary</h2>
+          <div className="w-full sm:w-[70%] mx-auto">
+            <h2 className="font-semibold mb-3 text-2xl text-[#1F2937]">
+              Order Summary
+            </h2>
             <div className="space-y-2 bg-white p-4 rounded-lg border border-teal-300">
-              {items.map(
-                (item) =>
-                  (
-                    <div
-                      key={item.key}
-                      className="flex justify-between text-gray-700"
-                    >
-                      <span>
-                        {item.label}
-                      </span>
-                      <span>
-                        ₹{item.price * orderDetails.orderitem[item.key]}
-                      </span>
-                    </div>
-                  )
-              )}
+              {items.map((item) => (
+                <div
+                  key={item.key}
+                  className="flex justify-between text-gray-700"
+                >
+                  <span>{item.label}</span>
+                  <span>₹{item.price * orderDetails.orderitem[item.key]}</span>
+                </div>
+              ))}
               <div className="flex justify-between font-bold border-t pt-2 text-teal-700">
                 <span>Total</span>
                 <span>₹{totalPrice}</span>
               </div>
-              </div>
-        </div>
+            </div>
+          </div>
         </section>
 
         <section className="bg-white w-full flex flex-col rounded-xs py-4 max-md:px-4">
-        <div className="w-full sm:w-[70%] mx-auto text-center">
-            <button className="w-[50%] mx-auto p-4 bg-teal-600 hover:bg-teal-700 text-lg font-bold text-white cursor-pointer rounded-lg"
-            type="submit"
+          <div className="w-full sm:w-[70%] mx-auto text-center">
+            <button
+              className="w-[50%] mx-auto p-4 bg-teal-600 hover:bg-teal-700 text-lg font-bold text-white cursor-pointer rounded-lg"
+              type="submit"
             >
-                {
-                  isPending ? (
-                    <span className="loading loading-spinner size-4"></span>
-                  ):(
-                    "Create Order"
-                  )
-                }
+              {isPending ? (
+                <span className="loading loading-spinner size-4"></span>
+              ) : (
+                "Create Order"
+              )}
             </button>
-        </div>
+          </div>
         </section>
       </form>
     </div>

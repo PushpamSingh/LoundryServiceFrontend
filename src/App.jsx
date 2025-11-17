@@ -16,9 +16,10 @@ import { AdminDash } from "./Pages/Admin/AdminDash";
 import { useAuthuser } from "./Hooks/useAuthuser";
 import { Onboard } from "./Pages/Onboard/Onboard";
 import { Payment } from "./Pages/PaymentPage/Payment";
-import { usePayment } from "./Zustand/usePayment";
-import { useEffect } from "react";
-import { is } from "zod/v4/locales";
+import { usePayment } from "./store/usePayment";
+import { Toaster } from "sonner";
+// import { useEffect } from "react";
+// import { is } from "zod/v4/locales";
 function App() {
   const { userData, userError, userLoading } = useAuthuser();
   const role = userData?.role || null;
@@ -34,16 +35,7 @@ function App() {
       children: [
         {
           index: true,
-          element:
-            isAuthenticated && !isOnboarded ? (
-              <Navigate to={"/onboarding"} />
-            ) : !isAuthenticated ? (
-              <Home />
-            ) : isOnboarded ? (
-              <Navigate to={"/"} />
-            ) : (
-              <Navigate to={"/onboarding"} />
-            ),
+          element: <Home />,
         },
         {
           path: "about",
@@ -114,7 +106,7 @@ function App() {
         {
           path: "trackorder",
           element: isAuthenticated ? (
-            isOnboarded && role === "user" ? (
+            isOnboarded ? (
               <TrackOrder />
             ) : (
               <Navigate to={"/onboarding"} />
@@ -169,7 +161,12 @@ function App() {
       ],
     },
   ]);
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <Toaster />
+    </>
+  );
 }
 
 export default App;

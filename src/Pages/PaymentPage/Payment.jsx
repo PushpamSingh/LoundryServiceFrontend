@@ -6,10 +6,11 @@ import {
   CreditCard,
   Shield,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { orderService } from "../../API/Order.service";
 import { razorpayService } from "../../API/Razorpay.service";
+import { toast } from "sonner";
 
 export const Payment = () => {
   const navigate = useNavigate();
@@ -19,25 +20,40 @@ export const Payment = () => {
   const [selectedPayment, setSelectedPayment] = useState("COD");
   // console.log("orderschemaid :: ", orderschemaid);
   // console.log("selectedPayment :: ", selectedPayment);
+  const [getoneOrder, setGetoneOrder] = useState(false);
+  const {data:oneorderData}=useQuery({
+    queryKey:["getOrder"],
+    queryFn:async()=>{
+      const response=await orderService.GetOneOrder({orderSchemaId:orderschemaid})
+      return response?.data ? response.data : null
+    },
+    enabled: getoneOrder && !!orderschemaid
+  })
 
-  const { mutate: confirmOrdermutation } = useMutation({
-    mutationFn: async () => {
-      const response = await orderService.ConfirmOrder({
-        orderId: orderschemaid,
-        selectedPayment,
-      });
+  useEffect(() => {
+    if(orderschemaid){
+      setGetoneOrder(true)
+    }
+  }, [orderschemaid]);
+
+  const { mutateAsync: confirmOrdermutation } = useMutation({
+    mutationFn: async (data) => {
+      const response = await orderService.ConfirmOrder(data);
       return response || null;
     },
     onSuccess: () => {
       queryclient.invalidateQueries({ queryKey: ["authUser"] });
+      queryclient.invalidateQueries({ queryKey: ["userallorders"] });
+      queryclient.invalidateQueries({ queryKey: ["usertotalorderstatuscount"] });
+      queryclient.invalidateQueries({ queryKey: ["allorders"] });
+      queryclient.invalidateQueries({ queryKey: ["totalorderstatuscount"] });
+      queryclient.invalidateQueries({ queryKey: ["userpaymenthistory"] });
       navigate("/userdashboard");
     },
   });
-  const { mutate: createRazorpayOrderMutation } = useMutation({
-    mutationFn: async () => {
-      const response = await razorpayService.CreateRazorpayOrder({
-        orderschemaid,
-      });
+  const { mutateAsync: createRazorpayOrderMutation } = useMutation({
+    mutationFn: async (data) => {
+      const response = await razorpayService.CreateRazorpayOrder(data);
       return response || null;
     },
     onSuccess: () => {
@@ -45,19 +61,14 @@ export const Payment = () => {
     },
   });
 
-  const { mutate: verifyRazorpaymutation } = useMutation({
+  const { mutateAsync: verifyRazorpaymutation,error:verifyRazorpayError } = useMutation({
     mutationFn: async (Verifyresponse) => {
       const response = await razorpayService.VerifyRazorpay(Verifyresponse);
       return response || null;
     },
     onSuccess: () => {
       queryclient.invalidateQueries({ queryKey: ["authUser"] });
-      confirmOrdermutation({
-        orderId: orderschemaid,
-        selectedPayment,
-      })
-
-      navigate("/userdashboard");
+      navigate("/");
     },
   });
 
@@ -72,7 +83,7 @@ export const Payment = () => {
         order_id: order.id,
         receipt: order.receipt,
         handler: async (response) => {
-          verifyRazorpaymutation(response);
+         await verifyRazorpaymutation(response);
         },
       };
       const rzp = new window.Razorpay(options);
@@ -84,13 +95,19 @@ export const Payment = () => {
   const PaymentHandler = async () => {
     try {
       if (selectedPayment === "COD") {
-        confirmOrdermutation();
+        await confirmOrdermutation({
+        orderId: orderschemaid,
+        selectedPayment,
+      });
       } else {
         setLoading(true);
-        const response = await createRazorpayOrderMutation();
-
+        const response = await createRazorpayOrderMutation({
+        orderschemaid,
+      });
+      // console.log("resonser:" , response);
+      
         if (response?.success) {
-          initPayment(response?.data);
+           initPayment(response?.data);
         }
         setLoading(false);
       }
@@ -101,6 +118,8 @@ export const Payment = () => {
   };
 
   // const
+  // console.log("selecetd: ",selectedPayment);
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
@@ -124,6 +143,13 @@ export const Payment = () => {
           </div>
         </div>
 
+          <div className="text-center">
+            {verifyRazorpayError && (
+              <p className="text-sm text-red-600 mt-2 p-4">
+                {verifyRazorpayError.message}
+              </p>
+            )}
+          </div>
         {/* Payment Options */}
         <div className="px-6 py-6">
           <div className="flex items-center justify-center mb-6">
@@ -269,7 +295,7 @@ export const Payment = () => {
             </h3>
             <div className="flex justify-between items-center py-2">
               <span className="text-gray-700 font-medium">Total</span>
-              <span className="text-2xl font-bold text-teal-600">$0.00</span>
+              <span className="text-2xl font-bold text-teal-600">₹{oneorderData?.orderitemDetails?.totalprice}</span>
             </div>
           </div>
         </div>
@@ -278,7 +304,7 @@ export const Payment = () => {
         <div className="p-6 bg-white">
           <button
             className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg shadow-teal-200 flex items-center justify-center group cursor-pointer"
-            onClick={PaymentHandler}
+            onClick={()=>PaymentHandler()}
           >
             {loading ? (
               <span className="text-lg">Processing...</span>

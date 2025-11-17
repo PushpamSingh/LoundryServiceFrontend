@@ -6,12 +6,14 @@ import { useNavigate } from "react-router-dom";
 
 export const Onboard=()=>{
     const [avatarUrl, setAvatarUrl] = useState('https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400');
+    const [avatarFile, setAvatarFile] = useState(null);
     const [userName] = useState('Pushpam Singh');
     const fileInputRef = useRef(null);
 
     const handleAvatarChange = (event) => {
       const file = event.target.files?.[0];
       if (file) {
+        setAvatarFile(file);
         const reader = new FileReader();
         reader.onloadend = () => {
           setAvatarUrl(reader.result);
@@ -33,7 +35,7 @@ export const Onboard=()=>{
     })
     const {mutate:onBoardmutation,isPending,error}=useMutation({
       mutationFn:async()=>{
-        const response=await authService.UploadAvatar({Filepath:avatarUrl})
+        const response=await authService.UploadAvatar({Filepath:avatarFile})
         return response?.data ? response.data :null
       },
       onSuccess:()=>{

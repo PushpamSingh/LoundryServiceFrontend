@@ -74,7 +74,7 @@ export const Header=()=>{
                 }
                 {
                     authStatus && (
-                        <Link to="/userdashboard" className="text-white border rounded-full p-1">
+                        <Link to={userData?.role === 'user' ? "/userdashboard":"/admindashboard"} className="text-white border rounded-full p-1">
                         <button className="flex gap-1 items-center">
                             <User2 className="text-white md:size-6 size-3"/>
                         </button>
@@ -88,7 +88,7 @@ export const Header=()=>{
            <TextAlignJustify className="text-white cursor-pointer sm:hidden" onClick={()=>setMobileView(!mobileView)}/>
             {
             authStatus && (
-                        <Link to="/userdashboard" className="text-white border rounded-full p-1 sm:hidden" onClick={()=>setMobileView(false)}>
+                        <Link to={userData?.role === 'user' ? "/userdashboard":"/admindashboard"} className="text-white border rounded-full p-1 sm:hidden" onClick={()=>setMobileView(false)}>
                         <button className="flex gap-1 items-center">
                             <User2 className="text-white size-6"/>
                         </button>
@@ -120,7 +120,7 @@ export const Header=()=>{
                 {
                     authStatus && (
                         <div className="flex gap-3 items-end">
-                        <Link to="/userdashboard" className="text-white border rounded-full p-1" onClick={()=>setMobileView(!mobileView)}>
+                        <Link to={userData?.role === 'user' ? "/userdashboard":"/admindashboard"} className="text-white border rounded-full p-1" onClick={()=>setMobileView(!mobileView)}>
                         <button className="flex gap-1 items-center">
                             <User2 className="text-white size-6"/>
                         </button>

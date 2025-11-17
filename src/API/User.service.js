@@ -16,7 +16,7 @@ class AuthService{
                 return response?.data
             }
         } catch (error) {
-            console.log("CreateUser :: Error :: ",error);
+            // console.log("CreateUser :: Error :: ",error);
             throw new Error(error.response?.data?.message || "Registration failed");
         }
     }
@@ -33,7 +33,7 @@ class AuthService{
                 return null
             }
         } catch (error) {
-            console.log("LoginUser :: Error :: ",error);
+            // console.log("LoginUser :: Error :: ",error);
             throw new Error(error.response?.data?.message || "Login failed");
         }
     }
@@ -48,7 +48,7 @@ class AuthService{
                 return null
             }
         } catch (error) {
-            console.log("LogOutUser :: Error :: ",error);
+            // console.log("LogOutUser :: Error :: ",error);
             return null
             throw new Error(error.response?.data?.message || "Logout failed");
         }
@@ -62,7 +62,7 @@ class AuthService{
                 return null
             }
         } catch (error) {
-            console.log("OnboardUser :: Error :: ",error);
+            // console.log("OnboardUser :: Error :: ",error);
             throw new Error(error.response?.data?.message || "Onboard failed");
         }
     }
@@ -75,7 +75,7 @@ class AuthService{
                 return null
             }
         } catch (error) {
-            console.log("GetCurrentUser :: Error :: ",error);
+            // console.log("GetCurrentUser :: Error :: ",error);
             return error.response?.data?.message
             throw new Error(error.response?.data?.message || "user Fetched failed");
         }
@@ -89,7 +89,7 @@ class AuthService{
                 return null
             }
         } catch (error) {
-            console.log("ChangePassword :: Error :: ",error);
+            // console.log("ChangePassword :: Error :: ",error);
             throw new Error(error.response?.data?.message || "password change failed");
         }
     }
@@ -104,7 +104,7 @@ class AuthService{
                 return null
             }
         } catch (error) {
-            console.log("UploadAvatar :: Error :: ",error);
+            // console.log("UploadAvatar :: Error :: ",error);
             throw new Error(error.response?.data?.message || "upload avatar failed");
         }
     }
