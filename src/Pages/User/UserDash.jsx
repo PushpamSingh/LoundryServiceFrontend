@@ -128,6 +128,7 @@ export function UserDash() {
     },
     onSuccess: () => {
       queryclient.invalidateQueries({ queryKey: ["authUser"] });
+      navigate("/login")
       toast.success("User Logged Out");
     },
     onError: () => {

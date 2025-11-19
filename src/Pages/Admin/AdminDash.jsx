@@ -90,11 +90,12 @@ export function AdminDash() {
     },
     onSuccess: () => {
       queryclient.invalidateQueries({ queryKey: ["authUser"] });
+      navigate("/login")
       toast.success("User Logged Out");
     },
     onError: () => {
-      queryclient.invalidateQueries({ queryKey: ["authUser"] });
       toast.error("Logout Mutation failed");
+      queryclient.invalidateQueries({ queryKey: ["authUser"] });
     },
   });
   const {
