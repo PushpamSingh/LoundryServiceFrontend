@@ -24,6 +24,7 @@ class AuthService{
         try {
             const response=await API.post("/login",{email,phone,password})
             if(response?.data){
+        
                 const {accessToken,refreshToken}=response.data?.data
                 localStorage.setItem("accessToken",accessToken)
                 localStorage.setItem("refreshToken",refreshToken)
@@ -39,7 +40,7 @@ class AuthService{
     }
     async LogoutUser(){
         try {
-            const response=await API.post('/logout',{headers:{Authorization: `Bearer ${token}`}})
+            const response=await API.post('/logout',{},{headers:{Authorization: `Bearer ${token}`}})
             if(response){
                 localStorage.setItem('accessToke',null)
                 localStorage.setItem('refreshToken',null)
@@ -55,7 +56,7 @@ class AuthService{
     }
     async OnboardUser(){
         try {
-            const response=await API.put('/onboarduser',{headers:{Authorization: `Bearer ${token}`}})
+            const response=await API.put('/onboarduser',{},{headers:{Authorization: `Bearer ${token}`}})
             if(response?.data){
                 return response?.data
             }else{
