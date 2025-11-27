@@ -42,7 +42,7 @@ class AuthService{
         try {
             const response=await API.post('/logout',{},{headers:{Authorization: `Bearer ${token}`}})
             if(response?.data){
-                console.log("response logout: ",response?.data);
+                // console.log("response logout: ",response?.data);
                 
                 localStorage.setItem('accessToken',null)
                 localStorage.setItem('refreshToken',null)
