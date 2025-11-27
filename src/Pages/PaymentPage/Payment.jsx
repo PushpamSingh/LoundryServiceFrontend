@@ -69,7 +69,7 @@ export const Payment = () => {
     },
     onSuccess: () => {
       queryclient.invalidateQueries({ queryKey: ["authUser"] });
-      navigate("/");
+      navigate("/userdashboard");
     },
   });
 
