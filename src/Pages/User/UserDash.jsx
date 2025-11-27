@@ -121,7 +121,7 @@ export function UserDash() {
   });
 
   // logout mutation — changed isPending -> isLoading (react-query uses isLoading)
-  const { mutate: Logoutmutation, isLoading: LogoutLoading } = useMutation({
+  const { mutate: Logoutmutation, isPending: LogoutPending } = useMutation({
     mutationFn: async () => {
       const response = await authService.LogoutUser();
       return response?.data ? response?.data : null;
@@ -131,8 +131,8 @@ export function UserDash() {
       navigate("/login")
       toast.success("User Logged Out");
     },
-    onError: () => {
-      toast.error("Logout Mutation failed");
+    onError: (error) => {
+      toast.error(`Logout Mutation failed:${error.message}`);
       queryclient.invalidateQueries({ queryKey: ["authUser"] });
     },
   });
@@ -150,7 +150,7 @@ export function UserDash() {
               className="flex items-center gap-2 text-red-500 hover:text-red-600 transition-colors"
               onClick={() => Logoutmutation()}
             >
-              {LogoutLoading ? (
+              {LogoutPending ? (
                 <span className="loading loading-spinner size-6"></span>
               ) : (
                 <>
