@@ -44,7 +44,7 @@ class AuthService{
             if(response?.data){
                 console.log("response logout: ",response?.data);
                 
-                localStorage.setItem('accessToke',null)
+                localStorage.setItem('accessToken',null)
                 localStorage.setItem('refreshToken',null)
                 return response?.data
             }else{
