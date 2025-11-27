@@ -13,6 +13,7 @@ import { useAuthuser } from "../../Hooks/useAuthuser";
 import { useState } from "react";
 import { authService } from "../../API/User.service";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
+import { useNavigate } from "react-router-dom";
 // import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 // import { toast } from "sonner"; // <-- added because you call toast
@@ -119,7 +120,7 @@ export function UserDash() {
       }
     },
   });
-
+const navigate=useNavigate()
   // logout mutation — changed isPending -> isLoading (react-query uses isLoading)
   const { mutate: Logoutmutation, isPending: LogoutPending } = useMutation({
     mutationFn: async () => {

@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { authService } from "../../API/User.service";
 import { useAuthuser } from "../../Hooks/useAuthuser";
+import { useNavigate } from "react-router-dom";
 // import { set } from "mongoose";
 
 export function AdminDash() {
@@ -82,7 +83,7 @@ export function AdminDash() {
       }
     },
   });
-
+const navigate=useNavigate()
   const { mutate: Logoutmutation, isPending: LogoutPending } = useMutation({
     mutationFn: async () => {
       const response = await authService.LogoutUser();
