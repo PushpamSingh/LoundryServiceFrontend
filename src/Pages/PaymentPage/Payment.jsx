@@ -58,6 +58,7 @@ export const Payment = () => {
     },
     onSuccess: () => {
       queryclient.invalidateQueries({ queryKey: ["authUser"] });
+      queryclient.invalidateQueries({ queryKey: ["getOrder"] });
     },
   });
 
@@ -97,7 +98,7 @@ export const Payment = () => {
       if (selectedPayment === "COD") {
         await confirmOrdermutation({
         orderId: orderschemaid,
-        selectedPayment,
+        paymentmethod:selectedPayment
       });
       } else {
         setLoading(true);
