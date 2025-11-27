@@ -132,8 +132,8 @@ export function UserDash() {
       toast.success("User Logged Out");
     },
     onError: () => {
-      queryclient.invalidateQueries({ queryKey: ["authUser"] });
       toast.error("Logout Mutation failed");
+      queryclient.invalidateQueries({ queryKey: ["authUser"] });
     },
   });
 

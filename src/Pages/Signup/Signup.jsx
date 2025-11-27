@@ -4,9 +4,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../../API/User.service";
 import { is } from "zod/v4/locales";
 import { useState } from "react";
+import { useAuthuser } from "../../Hooks/useAuthuser";
 
 export const Signup = () => {
   const navigate = useNavigate();
+  const {userRefetch}=useAuthuser()
   const [signupdata, setSignupdata] = useState({
     fullName: "",
     email: "",
@@ -25,6 +27,7 @@ export const Signup = () => {
       return response?.data ? response.data : null;
     },
     onSuccess: () => {
+      userRefetch()
       queryclient.invalidateQueries({ queryKey: ["authUser"] });
       navigate("/");
     },

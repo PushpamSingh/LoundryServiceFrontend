@@ -2,9 +2,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../../API/User.service";
 import { useState } from "react";
+import { useAuthuser } from "../../Hooks/useAuthuser";
 
 export const Login = () => {
   const navigate = useNavigate();
+  const{userRefetch}=useAuthuser()
   const [logindata, setLogindata] = useState({
     email: "",
     password: "",
@@ -17,6 +19,7 @@ export const Login = () => {
       return response?.data ? response.data : null;
     },
     onSuccess: () => {
+      userRefetch()
       queryclient.invalidateQueries({ queryKey: ["authUser"] });
       navigate("/");
     }
